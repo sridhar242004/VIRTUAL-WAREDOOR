@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Wardrobe</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.4/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            line-height: 1.6;
+        }
+    
+        .navbar {
+            background-color: #333;
+        }
+    
+        .navbar-brand {
+            font-size: 24px;
+        }
+    
+        .navbar-nav {
+            text-align: center;
+        }
+    
+        .nav-link {
+            color: #fff;
+            font-size: 16px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+    
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+    
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+    
+        .card {
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    
+        .card-header {
+            background-color: #333;
+            color: #fff;
+            border-radius: 8px 8px 0 0;
+            padding: 12px 20px;
+        }
+    
+        .card-body {
+            background-color: #fff;
+            padding: 20px;
+        }
+    
+        .btn-primary {
+            background-color: #333;
+            border-color: #333;
+            transition: background-color 0.3s ease;
+        }
+    
+        .btn-primary:hover {
+            background-color: #555;
+            border-color: #555;
+        }
+    
+        .btn-secondary {
+            background-color: #f0f0f0;
+            border-color: #ccc;
+            color: #333;
+            transition: background-color 0.3s ease;
+        }
+    
+        .btn-secondary:hover {
+            background-color: #ccc;
+            border-color: #ccc;
+            color: #333;
+        }
+    
+        /* Updated styles for outfit display */
+        .outfit {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+    
+        .outfit:hover {
+            transform: translateY(-5px);
+        }
+    
+        .outfit img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px 8px 0 0;
+            object-fit: cover; /* Ensure images cover the container */
+        }
+    
+        .outfit .card-body {
+            padding: 10px 20px;
+        }
+    
+        .outfit .card-title {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+    
+        .outfit .card-text {
+            font-size: 14px;
+            color: #666;
+        }
+    
+        /* Additional styles */
+    
+        /* Section headers */
+        h2.section-header {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+    
+        /* Form styles */
+        form {
+            margin-bottom: 20px;
+        }
+    
+        form .form-control {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    
+        form .form-control-file {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    
+        form .btn {
+            font-size: 18px;
+            padding: 10px 20px;
+        }
+    
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+    
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+    
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar-nav {
+                text-align: left;
+            }
+    
+            .nav-link {
+                padding: 8px;
+                font-size: 14px;
+            }
+    
+            .container {
+                padding: 10px;
+            }
+    
+            .outfit .card-body {
+                padding: 10px;
+            }
+    
+            .btn {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+    
+            footer {
+                padding: 10px 0;
+            }
+        }
+    
+        /* Additional Effects */
+    
+        /* 1. Fade-in animation */
+        .fade-in {
+            opacity: 0;
+            animation: fadeInAnimation 0.5s forwards;
+        }
+    
+        @keyframes fadeInAnimation {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    
+        /* 2. Border hover effect */
+        .border-hover {
+            transition: border-color 0.3s ease;
+        }
+    
+        .border-hover:hover {
+            border-color: #555;
+        }
+    
+        /* 3. Gradient background */
+        .gradient-bg {
+            background: linear-gradient(to right, #ff9966, #ff5e62);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* 4. Pulse animation */
+        .pulse {
+            animation: pulseAnimation 1s infinite ease-in-out;
+        }
+    
+        @keyframes pulseAnimation {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    
+        /* 5. Underline hover effect */
+        .underline-hover {
+            position: relative;
+            display: inline-block;
+            color: #333;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+    
+        .underline-hover::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #333;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease;
+        }
+    
+        .underline-hover:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    
+        /* 6. Grow on hover */
+        .grow {
+            transition: transform 0.3s ease;
+        }
+    
+        .grow:hover {
+            transform: scale(1.05);
+        }
+    
+        /* 7. Overlay on hover */
+        .overlay-hover {
+            position: relative;
+            overflow: hidden;
+        }
+    
+        .overlay-hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+    
+        .overlay-hover:hover::after {
+            opacity: 1;
+        }
+    
+        /* 8. Slide-in from left */
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+    
+        .slide-in-left.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    
+        /* 9. Slide-in from right */
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(20px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+    
+        .slide-in-right.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    
+        /* 10. Shake animation */
+        .shake {
+            animation: shakeAnimation 0.3s ease;
+        }
+    
+        @keyframes shakeAnimation {
+            0% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            50% {
+                transform: translateX(5px);
+            }
+            75% {
+                transform: translateX(-5px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+    
+        /* 11. Floating effect */
+        .float {
+            animation: floatAnimation 2s ease-in-out infinite;
+        }
+    
+        @keyframes floatAnimation {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+    /* Additional Effects (continued) */
+
+/* 12. Rotate on hover */
+.rotate-hover {
+    transition: transform 0.3s ease;
+}
+
+.rotate-hover:hover {
+    transform: rotate(360deg);
+}
+
+/* 13. Flip on hover */
+.flip-hover {
+    transition: transform 0.3s ease;
+}
+
+.flip-hover:hover {
+    transform: rotateY(180deg);
+}
+
+/* 14. Background color change */
+.bg-change {
+    transition: background-color 0.3s ease;
+}
+
+.bg-change:hover {
+    background-color: #f0f0f0;
+}
+
+/* 15. Scale on hover */
+.scale-hover {
+    transition: transform 0.3s ease;
+}
+
+.scale-hover:hover {
+    transform: scale(1.1);
+}
+
+/* 16. Box shadow on hover */
+.shadow-hover {
+    transition: box-shadow 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-hover:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 17. Border radius change */
+.radius-change {
+    transition: border-radius 0.3s ease;
+    border-radius: 4px;
+}
+
+.radius-change:hover {
+    border-radius: 50%;
+}
+
+/* 18. Text color change */
+.color-change {
+    transition: color 0.3s ease;
+    color: #333;
+}
+
+.color-change:hover {
+    color: #555;
+}
+
+/* 19. Opacity change */
+.opacity-change {
+    transition: opacity 0.3s ease;
+}
+
+.opacity-change:hover {
+    opacity: 0.8;
+}
+
+/* 20. Rotate icon on hover */
+.icon-rotate {
+    transition: transform 0.3s ease;
+}
+
+.icon-rotate:hover {
+    transform: rotate(180deg);
+}
+
+/* 21. Slide-down animation */
+.slide-down {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease-out;
+}
+
+.slide-down.open {
+    max-height: 500px; /* Adjust based on content height */
+}
+
+/* 22. Text underline on hover */
+.text-underline {
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.text-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 2px;
+    width: 100%;
+    background-color: #333;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.text-underline:hover::after {
+    transform: scaleX(1);
+}
+
+/* 23. Slide-in from top */
+.slide-in-top {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.slide-in-top.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 24. Slide-in from bottom */
+.slide-in-bottom {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.slide-in-bottom.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 25. Highlight on hover */
+.highlight-hover {
+    transition: background-color 0.3s ease;
+}
+
+.highlight-hover:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 26. Grow and shrink */
+.grow-shrink {
+    transition: transform 0.3s ease;
+}
+
+.grow-shrink:hover {
+    transform: scale(1.1);
+}
+
+/* 27. Pulse border */
+.pulse-border {
+    border-width: 1px;
+    border-style: solid;
+    transition: border-color 0.3s ease;
+}
+
+.pulse-border:hover {
+    border-color: #555;
+}
+
+/* 28. Background color gradient */
+.bg-gradient {
+    background: linear-gradient(to right, #30cfd0, #330867);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 29. Box grow on hover */
+.box-grow {
+    transition: transform 0.3s ease;
+}
+
+.box-grow:hover {
+    transform: scale(1.1);
+}
+
+/* 30. Text shadow on hover */
+.text-shadow-hover {
+    transition: text-shadow 0.3s ease;
+}
+
+.text-shadow-hover:hover {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+</style>
+
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Virtual Wardrobe</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#register-section">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#login-section">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#upload-section">Upload Items</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#outfit-section">Outfit Suggestions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#profile-section">My Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logout-btn" style="display:none;">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="register-section" class="card section">
+            <div class="card-header">
+                <h2>Create an Account</h2>
+            </div>
+            <div class="card-body">
+                <form id="register-form">
+                    <div class="form-group">
+                        <input type="text" id="register-username" class="form-control" placeholder="Username" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="register-password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+                <p class="mt-3">Already have an account? <a href="#login-section">Login</a></p>
+            </div>
+        </div>
+
+        <div id="login-section" class="card section active">
+            <div class="card-header">
+                <h2>Login to Your Account</h2>
+            </div>
+            <div class="card-body">
+                <form id="login-form">
+                    <div class="form-group">
+                        <input type="text" id="login-username" class="form-control" placeholder="Username" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="login-password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <p class="mt-3">Don't have an account yet? <a href="#register-section">Register</a></p>
+            </div>
+        </div>
+
+        <div id="upload-section" class="card section">
+            <div class="card-header">
+                <h2>Upload Items</h2>
+            </div>
+            <div class="card-body">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="file" id="item-images" class="form-control-file" accept="image/jpeg" multiple required>
+                        <small class="form-text text-muted">Choose up to 20 JPG images.</small>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="item-type" class="form-control" placeholder="Item Type (e.g., shirt, pants)" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="item-color" class="form-control" placeholder="Item Color" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="item-occasion" class="form-control" placeholder="Occasion (optional)">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload Items</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="outfit-section" class="card section">
+            <div class="card-header">
+                <h2>Outfit Suggestions</h2>
+            </div>
+            <div class="card-body" id="outfit-display"></div>
+        </div>
+
+        <div id="profile-section" class="card section">
+            <div class="card-header">
+                <h2>My Profile</h2>
+            </div>
+            <div class="card-body" id="user-profile">
+                <p>Welcome, <span id="username"></span>!</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-3">
+        <p>&copy; 2024 Virtual Wardrobe. All rights reserved.</p>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Simulated user data (replace with actual authentication and backend integration)
+        let currentUser = null;
+    
+        // Function to check if user is logged in
+        function checkAuth() {
+            currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                showLoggedInUI();
+            } else {
+                showLoggedOutUI();
+            }
+        }
+    
+        // Function to show UI elements when logged in
+        function showLoggedInUI() {
+            document.getElementById('username').textContent = currentUser.username;
+            document.getElementById('logout-btn').style.display = 'inline';
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById('upload-section').style.display = 'block';
+            document.getElementById('outfit-section').style.display = 'block';
+            document.getElementById('profile-section').style.display = 'block';
+            displayOutfits();
+        }
+    
+        // Function to show UI elements when logged out
+        function showLoggedOutUI() {
+            document.getElementById('logout-btn').style.display = 'none';
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById('login-section').style.display = 'block';
+        }
+    
+        // Event listener for item upload form submission
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            // Get form input values
+            let itemImages = document.getElementById('item-images').files;
+            let itemType = document.getElementById('item-type').value;
+            let itemColor = document.getElementById('item-color').value;
+            let itemOccasion = document.getElementById('item-occasion').value;
+    
+            // Validate number of images selected
+            if (itemImages.length < 1 || itemImages.length > 20) {
+                alert('Please select between 1 and 20 JPG images.');
+                return;
+            }
+    
+            // Upload each image and create outfit recommendation
+            for (let i = 0; i < itemImages.length; i++) {
+                let image = itemImages[i];
+                uploadItem(image, itemType, itemColor, itemOccasion);
+            }
+    
+            // Clear form after upload
+            document.getElementById('upload-form').reset();
+        });
+    
+        // Function to simulate item upload (replace with actual backend logic)
+        function uploadItem(image, type, color, occasion) {
+            let imageUrl = URL.createObjectURL(image);
+            let newItem = { type: type, color: color, occasion: occasion, imageUrl: imageUrl };
+    
+            if (!currentUser) {
+                currentUser = { username: 'Guest', items: [] };
+            }
+            currentUser.items.push(newItem);
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+            displayOutfits();
+        }
+    
+        // Function to display outfits
+        function displayOutfits() {
+            let outfitsContainer = document.getElementById('outfit-display');
+            outfitsContainer.innerHTML = '';
+            currentUser.items.forEach(item => {
+                let outfitDiv = document.createElement('div');
+                outfitDiv.classList.add('outfit', 'shadow');
+                outfitDiv.innerHTML = `
+                    <img src="${item.imageUrl}" class="card-img-top" alt="${item.type}">
+                    <div class="card-body">
+                        <h5 class="card-title">${item.type}</h5>
+                        <p class="card-text">Color: ${item.color}</p>
+                        <p class="card-text">Occasion: ${item.occasion || 'Not specified'}</p>
+                    `;
+                outfitsContainer.appendChild(outfitDiv);
+            });
+        }
+    
+        // Event listener for user login form submission
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let username = document.getElementById('login-username').value;
+            let password = document.getElementById('login-password').value;
+    
+            let user = users.find(user => user.username === username && user.password === password);
+            if (!user) {
+                alert('Invalid username or password. Please try again.');
+                return;
+            }
+    
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            showLoggedInUI();
+        });
+    
+        // Event listener for user registration form submission
+        document.getElementById('register-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let username = document.getElementById('register-username').value;
+            let password = document.getElementById('register-password').value;
+    
+            if (users.some(user => user.username === username)) {
+                alert('Username already taken. Please choose another one.');
+                return;
+            }
+    
+            let newUser = { username: username, password: password, items: [] };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('Registration successful! Please login to continue.');
+            document.getElementById('login-section').scrollIntoView({ behavior: 'smooth' });
+        });
+    
+        // Event listener for logout button
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showLoggedOutUI();
+        });
+    
+        // Toggle sections based on navigation clicks
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                let sectionId = this.getAttribute('href').substring(1);
+                toggleSection(sectionId);
+            });
+        });
+    
+        // Function to toggle section visibility
+        function toggleSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+        }
+    
+        // Load users from local storage (simulated)
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+    
+        // Check authentication status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
+    </script>
+    
