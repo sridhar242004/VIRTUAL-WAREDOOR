@@ -3,867 +3,669 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Wardrobe</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.4/dist/tailwind.min.css" rel="stylesheet">
+    <title>Real-time Icon Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            line-height: 1.6;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            transition: background 0.3s ease;
         }
-    
-        .navbar {
-            background-color: #333;
+
+        body.light-mode {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
         }
-    
-        .navbar-brand {
-            font-size: 24px;
+
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 3s ease-in-out infinite;
         }
-    
-        .navbar-nav {
-            text-align: center;
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
-    
-        .nav-link {
-            color: #fff;
-            font-size: 16px;
-            padding: 10px;
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .light-mode .glass-effect {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            from { box-shadow: 0 0 50px rgba(59, 130, 246, 0.3); }
+            to { box-shadow: 0 0 80px rgba(59, 130, 246, 0.5); }
+        }
+
+        .blob-animation {
+            animation: blob 7s ease-in-out infinite;
+        }
+
+        @keyframes blob {
+            0%, 100% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .magnetic-hover {
+            transition: transform 0.3s ease;
+        }
+
+        .magnetic-hover:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .category-chip {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
         }
-    
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+
+        .light-mode .category-chip {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
         }
-    
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
+
+        .category-chip:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-2px);
         }
-    
-        .card {
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
         }
-    
-        .card-header {
-            background-color: #333;
-            color: #fff;
-            border-radius: 8px 8px 0 0;
-            padding: 12px 20px;
-        }
-    
-        .card-body {
-            background-color: #fff;
-            padding: 20px;
-        }
-    
-        .btn-primary {
-            background-color: #333;
-            border-color: #333;
-            transition: background-color 0.3s ease;
-        }
-    
-        .btn-primary:hover {
-            background-color: #555;
-            border-color: #555;
-        }
-    
-        .btn-secondary {
-            background-color: #f0f0f0;
-            border-color: #ccc;
-            color: #333;
-            transition: background-color 0.3s ease;
-        }
-    
-        .btn-secondary:hover {
-            background-color: #ccc;
-            border-color: #ccc;
-            color: #333;
-        }
-    
-        /* Updated styles for outfit display */
-        .outfit {
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            max-width: 100%;
-            margin-bottom: 20px;
-        }
-    
-        .outfit:hover {
-            transform: translateY(-5px);
-        }
-    
-        .outfit img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 8px 8px 0 0;
-            object-fit: cover; /* Ensure images cover the container */
-        }
-    
-        .outfit .card-body {
-            padding: 10px 20px;
-        }
-    
-        .outfit .card-title {
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-    
-        .outfit .card-text {
-            font-size: 14px;
-            color: #666;
-        }
-    
-        /* Additional styles */
-    
-        /* Section headers */
-        h2.section-header {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #333;
-        }
-    
-        /* Form styles */
-        form {
-            margin-bottom: 20px;
-        }
-    
-        form .form-control {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-    
-        form .form-control-file {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-    
-        form .btn {
-            font-size: 18px;
-            padding: 10px 20px;
-        }
-    
-        /* Footer */
-        footer {
-            background-color: #333;
-            color: #fff;
-            padding: 20px 0;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-        }
-    
-        footer p {
-            margin: 0;
-            font-size: 14px;
-        }
-    
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .navbar-nav {
-                text-align: left;
-            }
-    
-            .nav-link {
-                padding: 8px;
-                font-size: 14px;
-            }
-    
-            .container {
-                padding: 10px;
-            }
-    
-            .outfit .card-body {
-                padding: 10px;
-            }
-    
-            .btn {
-                font-size: 16px;
-                padding: 8px 16px;
-            }
-    
-            footer {
-                padding: 10px 0;
+
+        @media (max-width: 640px) {
+            .icon-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             }
         }
-    
-        /* Additional Effects */
-    
-        /* 1. Fade-in animation */
-        .fade-in {
-            opacity: 0;
-            animation: fadeInAnimation 0.5s forwards;
+
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: fade-in 0.3s ease-in-out;
         }
-    
-        @keyframes fadeInAnimation {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+
+        .light-mode .icon-item {
+            background: rgba(255, 255, 255, 0.9);
         }
-    
-        /* 2. Border hover effect */
-        .border-hover {
-            transition: border-color 0.3s ease;
+
+        .icon-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
         }
-    
-        .border-hover:hover {
-            border-color: #555;
+
+        .light-mode .icon-item:hover {
+            background: rgba(255, 255, 255, 1);
         }
-    
-        /* 3. Gradient background */
-        .gradient-bg {
-            background: linear-gradient(to right, #ff9966, #ff5e62);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 4px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        .icon-preview {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.75rem;
         }
-    
-        /* 4. Pulse animation */
-        .pulse {
-            animation: pulseAnimation 1s infinite ease-in-out;
+
+        .loading-spinner {
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
         }
-    
-        @keyframes pulseAnimation {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-            }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-    
-        /* 5. Underline hover effect */
-        .underline-hover {
-            position: relative;
-            display: inline-block;
-            color: #333;
-            text-decoration: none;
-            transition: color 0.3s ease;
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-    
-        .underline-hover::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #333;
-            transform: scaleX(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease;
-        }
-    
-        .underline-hover:hover::after {
-            transform: scaleX(1);
-            transform-origin: bottom left;
-        }
-    
-        /* 6. Grow on hover */
-        .grow {
-            transition: transform 0.3s ease;
-        }
-    
-        .grow:hover {
-            transform: scale(1.05);
-        }
-    
-        /* 7. Overlay on hover */
-        .overlay-hover {
-            position: relative;
-            overflow: hidden;
-        }
-    
-        .overlay-hover::after {
-            content: '';
-            position: absolute;
+
+        .modal {
+            display: none;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .light-mode .modal-content {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 1000;
         }
-    
-        .overlay-hover:hover::after {
+
+        .toast.show {
             opacity: 1;
         }
-    
-        /* 8. Slide-in from left */
-        .slide-in-left {
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: transform 0.3s ease, opacity 0.3s ease;
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
         }
-    
-        .slide-in-left.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    
-        /* 9. Slide-in from right */
-        .slide-in-right {
-            opacity: 0;
-            transform: translateX(20px);
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-    
-        .slide-in-right.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    
-        /* 10. Shake animation */
-        .shake {
-            animation: shakeAnimation 0.3s ease;
-        }
-    
-        @keyframes shakeAnimation {
-            0% {
-                transform: translateX(0);
-            }
-            25% {
-                transform: translateX(-5px);
-            }
-            50% {
-                transform: translateX(5px);
-            }
-            75% {
-                transform: translateX(-5px);
-            }
-            100% {
-                transform: translateX(0);
-            }
-        }
-    
-        /* 11. Floating effect */
-        .float {
-            animation: floatAnimation 2s ease-in-out infinite;
-        }
-    
-        @keyframes floatAnimation {
-            0% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-            100% {
-                transform: translateY(0);
-            }
-        }
-    /* Additional Effects (continued) */
-
-/* 12. Rotate on hover */
-.rotate-hover {
-    transition: transform 0.3s ease;
-}
-
-.rotate-hover:hover {
-    transform: rotate(360deg);
-}
-
-/* 13. Flip on hover */
-.flip-hover {
-    transition: transform 0.3s ease;
-}
-
-.flip-hover:hover {
-    transform: rotateY(180deg);
-}
-
-/* 14. Background color change */
-.bg-change {
-    transition: background-color 0.3s ease;
-}
-
-.bg-change:hover {
-    background-color: #f0f0f0;
-}
-
-/* 15. Scale on hover */
-.scale-hover {
-    transition: transform 0.3s ease;
-}
-
-.scale-hover:hover {
-    transform: scale(1.1);
-}
-
-/* 16. Box shadow on hover */
-.shadow-hover {
-    transition: box-shadow 0.3s ease;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.shadow-hover:hover {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-}
-
-/* 17. Border radius change */
-.radius-change {
-    transition: border-radius 0.3s ease;
-    border-radius: 4px;
-}
-
-.radius-change:hover {
-    border-radius: 50%;
-}
-
-/* 18. Text color change */
-.color-change {
-    transition: color 0.3s ease;
-    color: #333;
-}
-
-.color-change:hover {
-    color: #555;
-}
-
-/* 19. Opacity change */
-.opacity-change {
-    transition: opacity 0.3s ease;
-}
-
-.opacity-change:hover {
-    opacity: 0.8;
-}
-
-/* 20. Rotate icon on hover */
-.icon-rotate {
-    transition: transform 0.3s ease;
-}
-
-.icon-rotate:hover {
-    transform: rotate(180deg);
-}
-
-/* 21. Slide-down animation */
-.slide-down {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.3s ease-out;
-}
-
-.slide-down.open {
-    max-height: 500px; /* Adjust based on content height */
-}
-
-/* 22. Text underline on hover */
-.text-underline {
-    text-decoration: none;
-    position: relative;
-    transition: color 0.3s ease;
-}
-
-.text-underline::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    height: 2px;
-    width: 100%;
-    background-color: #333;
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-}
-
-.text-underline:hover::after {
-    transform: scaleX(1);
-}
-
-/* 23. Slide-in from top */
-.slide-in-top {
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.slide-in-top.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* 24. Slide-in from bottom */
-.slide-in-bottom {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.slide-in-bottom.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* 25. Highlight on hover */
-.highlight-hover {
-    transition: background-color 0.3s ease;
-}
-
-.highlight-hover:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* 26. Grow and shrink */
-.grow-shrink {
-    transition: transform 0.3s ease;
-}
-
-.grow-shrink:hover {
-    transform: scale(1.1);
-}
-
-/* 27. Pulse border */
-.pulse-border {
-    border-width: 1px;
-    border-style: solid;
-    transition: border-color 0.3s ease;
-}
-
-.pulse-border:hover {
-    border-color: #555;
-}
-
-/* 28. Background color gradient */
-.bg-gradient {
-    background: linear-gradient(to right, #30cfd0, #330867);
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 4px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* 29. Box grow on hover */
-.box-grow {
-    transition: transform 0.3s ease;
-}
-
-.box-grow:hover {
-    transform: scale(1.1);
-}
-
-/* 30. Text shadow on hover */
-.text-shadow-hover {
-    transition: text-shadow 0.3s ease;
-}
-
-.text-shadow-hover:hover {
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-</style>
-
-    
+    </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">Virtual Wardrobe</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#register-section">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#login-section">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#upload-section">Upload Items</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#outfit-section">Outfit Suggestions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#profile-section">My Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="logout-btn" style="display:none;">Logout</a>
-                    </li>
-                </ul>
+<body class="min-h-screen py-12 px-4">
+    <button id="theme-toggle" class="theme-toggle bg-gray-800 p-2 rounded-full text-white hover:bg-gray-700 transition-colors">
+        <svg id="theme-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+    </button>
+
+    <section class="relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-900 via-purple-900/20 to-slate-900"></div>
+        <div class="absolute top-20 left-1/4 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl blob-animation"></div>
+        <div class="absolute bottom-20 right-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-3xl blob-animation" style="animation-delay: -2s;"></div>
+        
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="text-center mb-12">
+                <h1 class="text-5xl md:text-7xl font-black mb-4">
+                    <span class="text-gradient">ICON SEARCH</span>
+                </h1>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Discover and download free icons in real-time from IconFinder and The Noun Project
+                </p>
+            </div>
+
+            <div class="glass-effect rounded-xl p-6 glow-effect">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="search-input"
+                        placeholder="Search for icons (e.g., 'social', 'weather', 'arrow')" 
+                        class="w-full p-4 text-lg bg-transparent border-2 border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none transition-all duration-300 text-white placeholder-gray-500"
+                    >
+                    <button id="search-btn" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 rounded-lg p-2 transition-colors magnetic-hover">
+                        <svg id="search-icon" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <div id="loading-spinner" class="loading-spinner hidden"></div>
+                    </button>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="text-sm text-gray-400">Explore:</span>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="social">📱 Social</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="weather">☀️ Weather</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="arrow">➡️ Arrows</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="payment">💳 Payment</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="technology">💻 Technology</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="nature">🌿 Nature</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="business">📈 Business</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="education">📚 Education</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="food">🍎 Food</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="sports">⚽ Sports</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="medical">🏥 Medical</button>
+                    <button class="category-chip px-3 py-1 text-sm bg-gray-800 rounded-full flex items-center gap-1" data-query="travel">✈️ Travel</button>
+                </div>
+
+                <div id="results-container" class="mt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <button id="batch-download" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white text-sm transition-colors hidden">Download Selected</button>
+                        <div id="status-message" class="text-gray-400"></div>
+                    </div>
+                    <div id="icons-container" class="icon-grid"></div>
+                </div>
+
+                <p class="text-gray-400 text-sm mt-4">
+                    Icons provided by <a href="https://www.iconfinder.com" target="_blank" class="text-blue-400 hover:underline">IconFinder</a> and <a href="https://thenounproject.com" target="_blank" class="text-blue-400 hover:underline">The Noun Project</a>
+                </p>
             </div>
         </div>
-    </nav>
+    </section>
 
-    <div class="container">
-        <div id="register-section" class="card section">
-            <div class="card-header">
-                <h2>Create an Account</h2>
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title" class="text-white text-lg font-semibold mb-4"></h3>
+            <div id="modal-preview" class="mb-4 flex justify-center">
+                <img id="modal-image" src="" alt="" class="max-w-full max-h-96 transition-transform duration-300" style="transform: scale(1);">
             </div>
-            <div class="card-body">
-                <form id="register-form">
-                    <div class="form-group">
-                        <input type="text" id="register-username" class="form-control" placeholder="Username" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="register-password" class="form-control" placeholder="Password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Register</button>
-                </form>
-                <p class="mt-3">Already have an account? <a href="#login-section">Login</a></p>
+            <div class="flex justify-center gap-2 mb-4">
+                <button id="zoom-in" class="px-2 py-1 bg-gray-600 hover:bg-gray-700 rounded text-white text-sm">Zoom In</button>
+                <button id="zoom-out" class="px-2 py-1 bg-gray-600 hover:bg-gray-700 rounded text-white text-sm">Zoom Out</button>
             </div>
-        </div>
-
-        <div id="login-section" class="card section active">
-            <div class="card-header">
-                <h2>Login to Your Account</h2>
-            </div>
-            <div class="card-body">
-                <form id="login-form">
-                    <div class="form-group">
-                        <input type="text" id="login-username" class="form-control" placeholder="Username" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="login-password" class="form-control" placeholder="Password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
-                <p class="mt-3">Don't have an account yet? <a href="#register-section">Register</a></p>
-            </div>
-        </div>
-
-        <div id="upload-section" class="card section">
-            <div class="card-header">
-                <h2>Upload Items</h2>
-            </div>
-            <div class="card-body">
-                <form id="upload-form" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <input type="file" id="item-images" class="form-control-file" accept="image/jpeg" multiple required>
-                        <small class="form-text text-muted">Choose up to 20 JPG images.</small>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="item-type" class="form-control" placeholder="Item Type (e.g., shirt, pants)" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="item-color" class="form-control" placeholder="Item Color" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="item-occasion" class="form-control" placeholder="Occasion (optional)">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Upload Items</button>
-                </form>
-            </div>
-        </div>
-
-        <div id="outfit-section" class="card section">
-            <div class="card-header">
-                <h2>Outfit Suggestions</h2>
-            </div>
-            <div class="card-body" id="outfit-display"></div>
-        </div>
-
-        <div id="profile-section" class="card section">
-            <div class="card-header">
-                <h2>My Profile</h2>
-            </div>
-            <div class="card-body" id="user-profile">
-                <p>Welcome, <span id="username"></span>!</p>
+            <div class="flex justify-center gap-4">
+                <button id="modal-download-png" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white text-sm transition-colors">Download PNG</button>
+                <button id="modal-download-svg" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm transition-colors hidden">Download SVG</button>
+                <button id="modal-close" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white text-sm transition-colors">Close</button>
             </div>
         </div>
     </div>
 
-    <footer class="text-center py-3">
-        <p>&copy; 2024 Virtual Wardrobe. All rights reserved.</p>
-    </footer>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
 
     <script>
-        // Simulated user data (replace with actual authentication and backend integration)
-        let currentUser = null;
-    
-        // Function to check if user is logged in
-        function checkAuth() {
-            currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (currentUser) {
-                showLoggedInUI();
-            } else {
-                showLoggedOutUI();
+        class IconSearch {
+            constructor() {
+                this.searchInput = document.getElementById('search-input');
+                this.searchBtn = document.getElementById('search-btn');
+                this.searchIcon = document.getElementById('search-icon');
+                this.loadingSpinner = document.getElementById('loading-spinner');
+                this.iconsContainer = document.getElementById('icons-container');
+                this.statusMessage = document.getElementById('status-message');
+                this.searchChips = document.querySelectorAll('.category-chip');
+                this.previewModal = document.getElementById('preview-modal');
+                this.modalImage = document.getElementById('modal-image');
+                this.modalTitle = document.getElementById('modal-title');
+                this.modalDownloadPng = document.getElementById('modal-download-png');
+                this.modalDownloadSvg = document.getElementById('modal-download-svg');
+                this.modalClose = document.getElementById('modal-close');
+                this.zoomIn = document.getElementById('zoom-in');
+                this.zoomOut = document.getElementById('zoom-out');
+                this.batchDownload = document.getElementById('batch-download');
+                this.toast = document.getElementById('toast');
+                this.themeToggle = document.getElementById('theme-toggle');
+                this.themeIcon = document.getElementById('theme-icon');
+                
+                this.isSearching = false;
+                this.debounceTimer = null;
+                this.selectedIcons = [];
+                this.zoomLevel = 1;
+                
+                this.init();
             }
-        }
-    
-        // Function to show UI elements when logged in
-        function showLoggedInUI() {
-            document.getElementById('username').textContent = currentUser.username;
-            document.getElementById('logout-btn').style.display = 'inline';
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
-            });
-            document.getElementById('upload-section').style.display = 'block';
-            document.getElementById('outfit-section').style.display = 'block';
-            document.getElementById('profile-section').style.display = 'block';
-            displayOutfits();
-        }
-    
-        // Function to show UI elements when logged out
-        function showLoggedOutUI() {
-            document.getElementById('logout-btn').style.display = 'none';
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
-            });
-            document.getElementById('login-section').style.display = 'block';
-        }
-    
-        // Event listener for item upload form submission
-        document.getElementById('upload-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-    
-            // Get form input values
-            let itemImages = document.getElementById('item-images').files;
-            let itemType = document.getElementById('item-type').value;
-            let itemColor = document.getElementById('item-color').value;
-            let itemOccasion = document.getElementById('item-occasion').value;
-    
-            // Validate number of images selected
-            if (itemImages.length < 1 || itemImages.length > 20) {
-                alert('Please select between 1 and 20 JPG images.');
-                return;
+            
+            init() {
+                this.searchInput.addEventListener('input', () => this.handleInput());
+                this.searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.searchIcons();
+                });
+                this.searchBtn.addEventListener('click', () => this.searchIcons());
+                
+                this.searchChips.forEach(chip => {
+                    chip.addEventListener('click', () => {
+                        this.searchInput.value = chip.getAttribute('data-query');
+                        this.searchIcons();
+                    });
+                });
+
+                this.modalClose.addEventListener('click', () => {
+                    this.previewModal.style.display = 'none';
+                    this.zoomLevel = 1;
+                    this.modalImage.style.transform = `scale(1)`;
+                });
+
+                this.zoomIn.addEventListener('click', () => {
+                    this.zoomLevel = Math.min(this.zoomLevel + 0.2, 2);
+                    this.modalImage.style.transform = `scale(${this.zoomLevel})`;
+                });
+
+                this.zoomOut.addEventListener('click', () => {
+                    this.zoomLevel = Math.max(this.zoomLevel - 0.2, 0.5);
+                    this.modalImage.style.transform = `scale(${this.zoomLevel})`;
+                });
+
+                this.modalDownloadPng.addEventListener('click', () => {
+                    this.downloadIcon(
+                        this.modalDownloadPng.getAttribute('data-url'),
+                        false,
+                        this.modalTitle.textContent
+                    );
+                });
+
+                this.modalDownloadSvg.addEventListener('click', () => {
+                    this.downloadIcon(
+                        this.modalDownloadSvg.getAttribute('data-svg'),
+                        true,
+                        this.modalTitle.textContent
+                    );
+                });
+
+                this.batchDownload.addEventListener('click', () => {
+                    this.selectedIcons.forEach(icon => {
+                        this.downloadIcon(icon.downloadUrl, icon.svgUrl, icon.name);
+                    });
+                    this.showToast(`Downloaded ${this.selectedIcons.length} icons`);
+                    this.selectedIcons = [];
+                    this.batchDownload.classList.add('hidden');
+                });
+
+                this.themeToggle.addEventListener('click', () => {
+                    document.body.classList.toggle('light-mode');
+                    this.themeIcon.innerHTML = document.body.classList.contains('light-mode') 
+                        ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>`
+                        : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>`;
+                });
             }
-    
-            // Upload each image and create outfit recommendation
-            for (let i = 0; i < itemImages.length; i++) {
-                let image = itemImages[i];
-                uploadItem(image, itemType, itemColor, itemOccasion);
+            
+            handleInput() {
+                clearTimeout(this.debounceTimer);
+                this.debounceTimer = setTimeout(() => {
+                    if (this.searchInput.value.trim().length > 2) {
+                        this.searchIcons();
+                    } else {
+                        this.statusMessage.textContent = 'Enter at least 3 characters to search';
+                        this.iconsContainer.innerHTML = '';
+                    }
+                }, 500);
             }
-    
-            // Clear form after upload
-            document.getElementById('upload-form').reset();
-        });
-    
-        // Function to simulate item upload (replace with actual backend logic)
-        function uploadItem(image, type, color, occasion) {
-            let imageUrl = URL.createObjectURL(image);
-            let newItem = { type: type, color: color, occasion: occasion, imageUrl: imageUrl };
-    
-            if (!currentUser) {
-                currentUser = { username: 'Guest', items: [] };
+            
+            async searchIcons() {
+                const query = this.searchInput.value.trim();
+                if (!query || this.isSearching) {
+                    console.log('Search aborted: Empty query or already searching');
+                    return;
+                }
+                
+                this.startLoading();
+                this.statusMessage.innerHTML = '<span class="animate-pulse">🔍 Searching for icons...</span>';
+                this.selectedIcons = [];
+                this.batchDownload.classList.add('hidden');
+                
+                try {
+                    const icons = await this.searchFreeIconSources(query);
+                    if (icons.length === 0) {
+                        this.statusMessage.innerHTML = '❌ No icons found. Try a different search term.';
+                        this.iconsContainer.innerHTML = '';
+                    } else {
+                        this.displayIcons(icons);
+                        this.statusMessage.innerHTML = `✅ Found ${icons.length} icons`;
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    this.statusMessage.innerHTML = this.getErrorMessage(error);
+                    this.iconsContainer.innerHTML = '';
+                    this.displayFallbackIcons(query);
+                } finally {
+                    this.stopLoading();
+                }
             }
-            currentUser.items.push(newItem);
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    
-            displayOutfits();
-        }
-    
-        // Function to display outfits
-        function displayOutfits() {
-            let outfitsContainer = document.getElementById('outfit-display');
-            outfitsContainer.innerHTML = '';
-            currentUser.items.forEach(item => {
-                let outfitDiv = document.createElement('div');
-                outfitDiv.classList.add('outfit', 'shadow');
-                outfitDiv.innerHTML = `
-                    <img src="${item.imageUrl}" class="card-img-top" alt="${item.type}">
-                    <div class="card-body">
-                        <h5 class="card-title">${item.type}</h5>
-                        <p class="card-text">Color: ${item.color}</p>
-                        <p class="card-text">Occasion: ${item.occasion || 'Not specified'}</p>
+            
+            async searchFreeIconSources(query) {
+                const sources = [
+                    { fetch: () => this.searchIconfinder(query), retryCount: 2 },
+                    { fetch: () => this.searchNounProject(query), retryCount: 2 }
+                ];
+                
+                for (const source of sources) {
+                    for (let attempt = 1; attempt <= source.retryCount; attempt++) {
+                        try {
+                            console.log(`Attempt ${attempt} for ${source.fetch.name}`);
+                            const results = await source.fetch();
+                            if (results.length > 0) return results.slice(0, 24);
+                        } catch (error) {
+                            console.warn(`Attempt ${attempt} failed for ${source.fetch.name}:`, error);
+                            if (attempt === source.retryCount) {
+                                console.log(`Exhausted retries for ${source.fetch.name}`);
+                            }
+                        }
+                    }
+                }
+                
+                throw new Error('All icon sources failed');
+            }
+            
+            async searchIconfinder(query) {
+                try {
+                    const proxyUrl = `https://thingproxy.freeboard.io/fetch/https://api.iconfinder.com/v4/icons/search?query=${encodeURIComponent(query)}&count=24&premium=false`;
+                    console.log('Fetching from IconFinder:', proxyUrl);
+                    const response = await fetch(proxyUrl, {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    if (!response.ok) throw new Error(`IconFinder API error: ${response.status}`);
+                    
+                    const data = await response.json();
+                    console.log('IconFinder response:', data);
+                    
+                    if (!data.icons || data.icons.length === 0) {
+                        console.log('No icons from IconFinder');
+                        return [];
+                    }
+
+                    return data.icons.map(icon => ({
+                        name: icon.tags[0] || query,
+                        previewUrl: icon.raster_sizes?.find(size => size.size_width >= 64)?.formats[0]?.preview_url || 'https://via.placeholder.com/80',
+                        downloadUrl: icon.raster_sizes?.find(size => size.size_width >= 64)?.formats[0]?.download_url || icon.raster_sizes[0]?.formats[0]?.preview_url,
+                        svgUrl: icon.vector_sizes?.[0]?.formats?.find(f => f.format === 'svg')?.download_url || null,
+                        source: 'IconFinder',
+                        tags: icon.tags.slice(0, 3)
+                    }));
+                } catch (error) {
+                    console.log('IconFinder failed:', error);
+                    throw error;
+                }
+            }
+            
+            async searchNounProject(query) {
+                try {
+                    const proxyUrl = `https://thingproxy.freeboard.io/fetch/https://api.thenounproject.com/v2/icon?query=${encodeURIComponent(query)}&limit=24`;
+                    console.log('Fetching from Noun Project:', proxyUrl);
+                    const response = await fetch(proxyUrl, {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    if (!response.ok) throw new Error(`Noun Project API error: ${response.status}`);
+                    
+                    const data = await response.json();
+                    console.log('Noun Project response:', data);
+                    
+                    if (!data.icons || data.icons.length === 0) {
+                        console.log('No icons from Noun Project');
+                        return [];
+                    }
+
+                    return data.icons.map(icon => ({
+                        name: icon.term || query,
+                        previewUrl: icon.preview_url_84 || icon.preview_url || 'https://via.placeholder.com/80',
+                        downloadUrl: icon.preview_url_84 || icon.preview_url,
+                        svgUrl: null,
+                        source: 'The Noun Project',
+                        tags: icon.tags.slice(0, 3)
+                    }));
+                } catch (error) {
+                    console.log('Noun Project failed:', error);
+                    throw error;
+                }
+            }
+            
+            displayFallbackIcons(query) {
+                const fallbackIcons = [
+                    { name: 'Star', previewUrl: 'https://useiconic.com/open/icon/star', downloadUrl: 'https://useiconic.com/open/icon/star', svgUrl: null, source: 'Open Iconic', tags: ['star', 'favorite'] },
+                    { name: 'Heart', previewUrl: 'https://useiconic.com/open/icon/heart', downloadUrl: 'https://useiconic.com/open/icon/heart', svgUrl: null, source: 'Open Iconic', tags: ['heart', 'like'] },
+                    { name: 'Arrow', previewUrl: 'https://useiconic.com/open/icon/arrow-right', downloadUrl: 'https://useiconic.com/open/icon/arrow-right', svgUrl: null, source: 'Open Iconic', tags: ['arrow', 'direction'] }
+                ];
+                
+                this.displayIcons(fallbackIcons);
+                this.statusMessage.innerHTML = '⚠️ API failed. Showing fallback icons from Open Iconic.';
+            }
+            
+            displayIcons(icons) {
+                this.iconsContainer.innerHTML = '';
+                
+                icons.forEach((icon, index) => {
+                    const iconElement = document.createElement('div');
+                    iconElement.className = 'icon-item';
+                    iconElement.style.animationDelay = `${index * 0.1}s`;
+                    
+                    iconElement.innerHTML = `
+                        <input type="checkbox" class="select-icon absolute top-2 right-2" data-name="${icon.name}" data-url="${icon.downloadUrl}" data-svg="${icon.svgUrl || ''}">
+                        <div class="icon-preview">
+                            <img src="${icon.previewUrl}" alt="${icon.name}" width="80" height="80" loading="lazy" onerror="this.src='https://via.placeholder.com/80'">
+                        </div>
+                        <span class="text-xs text-gray-300 text-center">${icon.name}</span>
+                        <div class="mt-2 flex gap-2">
+                            <button class="preview-btn px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 rounded text-white transition-colors" 
+                                    data-url="${icon.previewUrl}" 
+                                    data-svg="${icon.svgUrl || ''}" 
+                                    data-name="${icon.name}">
+                                Preview
+                            </button>
+                            <button class="download-btn px-2 py-1 text-xs bg-green-600 hover:bg-green-700 rounded text-white transition-colors" 
+                                    data-url="${icon.downloadUrl}" 
+                                    data-svg="${icon.svgUrl || ''}" 
+                                    data-name="${icon.name}">
+                                Download
+                            </button>
+                        </div>
+                        <span class="text-xs text-gray-500 mt-1">${icon.source}</span>
                     `;
-                outfitsContainer.appendChild(outfitDiv);
-            });
-        }
-    
-        // Event listener for user login form submission
-        document.getElementById('login-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let username = document.getElementById('login-username').value;
-            let password = document.getElementById('login-password').value;
-    
-            let user = users.find(user => user.username === username && user.password === password);
-            if (!user) {
-                alert('Invalid username or password. Please try again.');
-                return;
+                    
+                    const previewBtn = iconElement.querySelector('.preview-btn');
+                    previewBtn.addEventListener('click', () => {
+                        this.showPreviewModal(icon.previewUrl, icon.svgUrl, icon.name);
+                    });
+
+                    const downloadBtn = iconElement.querySelector('.download-btn');
+                    downloadBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.downloadIcon(
+                            downloadBtn.getAttribute('data-url'),
+                            downloadBtn.getAttribute('data-svg'),
+                            icon.name
+                        );
+                    });
+
+                    const selectCheckbox = iconElement.querySelector('.select-icon');
+                    selectCheckbox.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            this.selectedIcons.push({
+                                name: icon.name,
+                                downloadUrl: icon.downloadUrl,
+                                svgUrl: icon.svgUrl
+                            });
+                        } else {
+                            this.selectedIcons = this.selectedIcons.filter(i => i.name !== icon.name);
+                        }
+                        this.batchDownload.classList.toggle('hidden', this.selectedIcons.length === 0);
+                    });
+                    
+                    this.iconsContainer.appendChild(iconElement);
+                });
             }
-    
-            currentUser = user;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            showLoggedInUI();
-        });
-    
-        // Event listener for user registration form submission
-        document.getElementById('register-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let username = document.getElementById('register-username').value;
-            let password = document.getElementById('register-password').value;
-    
-            if (users.some(user => user.username === username)) {
-                alert('Username already taken. Please choose another one.');
-                return;
+            
+            showPreviewModal(previewUrl, svgUrl, name) {
+                this.modalImage.src = previewUrl;
+                this.modalTitle.textContent = name;
+                this.modalDownloadPng.setAttribute('data-url', previewUrl);
+                this.modalDownloadSvg.setAttribute('data-svg', svgUrl || '');
+                this.modalDownloadSvg.classList.toggle('hidden', !svgUrl);
+                this.zoomLevel = 1;
+                this.modalImage.style.transform = `scale(1)`;
+                this.previewModal.style.display = 'flex';
             }
-    
-            let newUser = { username: username, password: password, items: [] };
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            alert('Registration successful! Please login to continue.');
-            document.getElementById('login-section').scrollIntoView({ behavior: 'smooth' });
-        });
-    
-        // Event listener for logout button
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            showLoggedOutUI();
-        });
-    
-        // Toggle sections based on navigation clicks
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(event) {
-                event.preventDefault();
-                let sectionId = this.getAttribute('href').substring(1);
-                toggleSection(sectionId);
-            });
-        });
-    
-        // Function to toggle section visibility
-        function toggleSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
-            });
-            document.getElementById(sectionId).style.display = 'block';
+            
+            downloadIcon(url, svgUrl, name) {
+                this.showToast(`Downloading ${name} icon...`);
+                if (svgUrl) {
+                    const blob = new Blob([decodeURIComponent(svgUrl)], { type: 'image/svg+xml' });
+                    const tempUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = tempUrl;
+                    a.download = `${name}-icon.svg`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(tempUrl);
+                } else {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${name}-icon.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+                
+                this.showToast(`Downloaded ${name} icon`);
+            }
+            
+            showToast(message) {
+                this.toast.textContent = message;
+                this.toast.classList.add('show');
+                setTimeout(() => {
+                    this.toast.classList.remove('show');
+                }, 3000);
+            }
+            
+            startLoading() {
+                this.isSearching = true;
+                this.searchIcon.classList.add('hidden');
+                this.loadingSpinner.classList.remove('hidden');
+                this.searchBtn.disabled = true;
+            }
+            
+            stopLoading() {
+                this.isSearching = false;
+                this.searchIcon.classList.remove('hidden');
+                this.loadingSpinner.classList.add('hidden');
+                this.searchBtn.disabled = false;
+            }
+            
+            getErrorMessage(error) {
+                if (error.message.includes('429')) {
+                    return '⚠️ API rate limit reached. Please try again later or use a different query.';
+                } else if (error.message.includes('network')) {
+                    return '🌐 Network error. Check your internet connection and try again.';
+                } else {
+                    return '❌ Error fetching icons. Please try again.';
+                }
+            }
         }
-    
-        // Load users from local storage (simulated)
-        let users = JSON.parse(localStorage.getItem('users')) || [];
-    
-        // Check authentication status on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            new IconSearch();
         });
     </script>
-    
+</body>
+</html>
